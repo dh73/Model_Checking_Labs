@@ -30,7 +30,9 @@ module timer
    default disable iff (!i_rstn);
    
    constraint_hb: assume property (i_heartbeat == 1'b0);
-   timeout_reached: assert property (count != 4'd0 && !timeout |-> count < 4'd10);
+   // If counter is not zero and timeout is not asserted, impplies that the count value is less than 4'd10.
+   // (Because if timeout is asserted, count should not be 0 and it should be 4'd10 instead).
+   timeout_reached: assert property (count != 4'd0 && !timeout |-> count <= 4'd10);
 endmodule // timer
 
 
