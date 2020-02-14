@@ -31,7 +31,7 @@ module booth_multiplier #(parameter N=8, M=$clog2(N))
 	
 	right_shift:
 	  begin
-	     if(cnt == {N{1'b1}}) // :-)
+	     if(cnt == {N{1'b0}}) // :-)  
 	       next = idle;
 	     else      
 	       next = computation;
@@ -81,5 +81,5 @@ module booth_multiplier #(parameter N=8, M=$clog2(N))
 
    // If current state is in right_shift and counter is empty, next state should be
    // idle in the next clock cycle.
-   correct_result: assert property (current == right_shift && ~&cnt |-> ##1 current == idle);
+   correct_result: assert property (current == right_shift && cnt == 0 |-> ##1 current == idle);
 endmodule // booth_mult_asm

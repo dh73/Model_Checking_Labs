@@ -1,25 +1,25 @@
 `default_nettype none
 module booth_multiplier #(parameter N=8, M=$clog2(N))
-   (output logic [N*2-1:0] o_result,
-    output logic       o_finish,
+   (output wire [N*2-1:0] o_result,
+    output reg 	       o_finish,
     input wire 	       i_clk, i_rst_n,
     input wire 	       i_start,
     input wire [N-1:0] i_multiplier, i_multiplicand);
 
    // internal signals
-   typedef enum        logic [1:0] {idle, computation, right_shift} states_t;
-   states_t current, next;
-   logic [N:0] 	       mp;
-   logic [N-1:0]       mcand, cnt;
-   logic [N*2-1:0]     acc;
+   localparam idle=0, computation=1, right_shift=2;
+   reg [1:0] 	       current, next;
+   reg [N:0] 	       mp;
+   reg [N-1:0] 	       mcand, cnt;
+   reg [N*2-1:0]       acc;
 
-   always_ff @(posedge i_clk) begin
+   always @(posedge i_clk) begin
       if(~i_rst_n) current <= idle;
       else         current <= next;
    end
    
-   always_comb begin
-      unique case(current)
+   always @(*) begin
+      case(current)
 	idle:
 	  begin
 	     if(i_start) next = computation;
@@ -31,7 +31,7 @@ module booth_multiplier #(parameter N=8, M=$clog2(N))
 	
 	right_shift:
 	  begin
-	     if(cnt == {N{1'b1}}) // :-)
+	     if(cnt == {N{1'b0}}) // :-)  
 	       next = idle;
 	     else      
 	       next = computation;
@@ -40,7 +40,7 @@ module booth_multiplier #(parameter N=8, M=$clog2(N))
       endcase // unique case (current)
    end // always_comb
 
-   always_ff @(posedge i_clk) begin
+   always @(posedge i_clk) begin
       case(current)
 	idle:
 	  begin
@@ -76,10 +76,11 @@ module booth_multiplier #(parameter N=8, M=$clog2(N))
    assign o_result = {acc, mp[N:1]};
    
    // Model checking properties
-   default clocking fpv_clk @(posedge i_clk); endclocking
-   default disable iff (!i_rst_n);
-
    // If current state is in right_shift and counter is empty, next state should be
    // idle in the next clock cycle.
-   correct_result: assert property (current == right_shift && ~&cnt |-> ##1 current == idle);
+   always @(*) begin
+      if (i_rst_n && current == right_shift && cnt == {N{1'b0}})
+	assert (next == idle);
+   end
+   
 endmodule // booth_mult_asm

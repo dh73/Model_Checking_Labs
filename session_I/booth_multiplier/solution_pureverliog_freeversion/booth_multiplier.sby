@@ -1,0 +1,12 @@
+[options]
+mode prove
+
+[engines]
+smtbmc
+
+[script]
+read -formal booth_multiplier.v
+prep -top booth_multiplier
+
+[files]
+booth_multiplier.v
