@@ -1,0 +1,17 @@
+# TODO: Find a smarter way to read xeclib
+read_verilog ../xeclibs/unisims/IBUF.v
+read_verilog ../xeclibs/unisims/FDRE.v
+read_verilog ../xeclibs/unisims/OBUF.v
+read_verilog ../xeclibs/unisims/LUT4.v
+read_verilog ../xeclibs/unisims/LUT3.v
+read_verilog ../xeclibs/unisims/LUT2.v
+read_verilog ../xeclibs/unisims/LUT1.v
+read_verilog ../xeclibs/unisims/INV.v
+read_verilog ../xeclibs/unisims/BUFG.v
+read_verilog ../xeclibs/unisims/VCC.v
+read_verilog ../xeclibs/unisims/CARRY4.v
+# Revised 
+read_verilog top_syn.v
+prep -flatten -top top
+splitnets -ports
+design -stash gate
