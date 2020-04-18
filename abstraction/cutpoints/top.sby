@@ -1,0 +1,17 @@
+[options]
+mode cover
+depth 10
+
+[engines]
+smtbmc --progress
+
+[script]
+read -sv top.sv
+read -sv abstract.sv
+verific -import top 
+prep -top top
+cd top; cutpoint abstract.value; cd
+
+[files]
+top.sv
+abstract.sv
